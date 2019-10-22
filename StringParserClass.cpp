@@ -9,6 +9,7 @@
 #include <string.h>
 #include <vector>
 #include "../327_proj3_test/includes/StringParserClass.h"
+#include "../327_proj3_test/includes/constants.h"
 
 using namespace std;
 using namespace KP_StringParserClass;
@@ -35,7 +36,12 @@ using namespace KP_StringParserClass;
 		//SUCCESS
 		//ERROR_TAGS_NULL if either pStart or pEnd is null
 		int StringParserClass::setTags(const char *pStart, const char *pEnd) {
+			if(!pStart || !pEnd)
+				return ERROR_TAGS_NULL;
 
+			pStartTag = new char(*pStart); // this works on VS_2017
+			pEndTag = new char(*pEnd);
+			return SUCCESS;
 		}
 
 		//First clears myVector
