@@ -42,6 +42,7 @@ using namespace KP_StringParserClass;
 
 			pStartTag = new char(*pStart); // this works on VS_2017
 			pEndTag = new char(*pEnd);
+			areTagsSet = true;
 			return SUCCESS;
 		}
 
@@ -54,7 +55,7 @@ using namespace KP_StringParserClass;
 		//ERROR_DATA_NULL pDataToSearchThru is null
 		int StringParserClass::getDataBetweenTags(char *pDataToSearchThru, vector<string> &myVector) {
 			myVector.clear();
-			if(!pStartTag || !pEndTag)	// confirm order of fail conditions during testing
+			if(!areTagsSet)	// confirm order of fail conditions during testing
 				return ERROR_TAGS_NULL;
 			if(!pDataToSearchThru)
 				return ERROR_DATA_NULL;
@@ -84,7 +85,11 @@ using namespace KP_StringParserClass;
 
 
 		void StringParserClass::cleanup() {
-
+			if(areTagsSet){
+				delete pStartTag;
+				delete pEndTag;
+			}
+			pStartTag = pEndTag = areTagsSet = false;
 		}
 
 		//Searches a string starting at pStart for pTagToLookFor
