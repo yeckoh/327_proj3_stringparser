@@ -9,6 +9,7 @@
 #include <string.h>
 #include <vector>
 #include <sstream>
+#include <iostream>
 #include "../327_proj3_test/includes/StringParserClass.h"
 #include "../327_proj3_test/includes/constants.h"
 
@@ -63,8 +64,7 @@ using namespace KP_StringParserClass;
 
 			int start = data.find(pStartTag);
 			int end = data.find(pEndTag);
-			data = data.substr(start, end);
-
+			data = data.substr(start, (end-start));
 			stringstream ss(data);
 			char val;
 			data = ""; // reuse data as single word string
@@ -72,6 +72,7 @@ using namespace KP_StringParserClass;
 			do {	// will produce lots of empty strings and include the tag word
 				val = ss.get();
 				if(val == ' ' || val == '/' || val == '<' || val == '>') {
+				//if(val == ' ') {
 					myVector.push_back(data);
 					data = "";
 				}
@@ -80,6 +81,12 @@ using namespace KP_StringParserClass;
 			}
 			while(!ss.eof());
 
+			for(int i = 0;i < myVector.size();++i) {
+				if(myVector[i] == ""){
+					myVector[i].erase();
+					--i;
+				}
+			}
 			return SUCCESS;
 		}
 
@@ -103,11 +110,10 @@ using namespace KP_StringParserClass;
 				return ERROR_TAGS_NULL;
 			string look_in = pTagToLookFor;
 			int start = look_in.find(pStart);
-			int end = look_in.find(pEnd);
+			int end = look_in.find(pEnd,start);
 			if(end == string::npos)
 				return FAIL;
-			look_in = look_in.substr(start, end);
-
+			look_in = look_in.substr(start, (end-start));
 			return SUCCESS;
 		}
 
