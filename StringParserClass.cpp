@@ -89,7 +89,8 @@ using namespace KP_StringParserClass;
 				delete pStartTag;
 				delete pEndTag;
 			}
-			pStartTag = pEndTag = areTagsSet = false;
+			pStartTag = pEndTag = NULL;
+			areTagsSet = 0;
 		}
 
 		//Searches a string starting at pStart for pTagToLookFor
@@ -98,6 +99,15 @@ using namespace KP_StringParserClass;
 		//FAIL did not find pTagToLookFor and pEnd points to 0
 		//ERROR_TAGS_NULL if either pStart or pEnd is null
 		int StringParserClass::findTag(char *pTagToLookFor, char *&pStart, char *&pEnd) {
+			if(!areTagsSet)
+				return ERROR_TAGS_NULL;
+			string look_in = pTagToLookFor;
+			int start = look_in.find(pStart);
+			int end = look_in.find(pEnd);
+			if(end == string::npos)
+				return FAIL;
+			look_in = look_in.substr(start, end);
 
+			return SUCCESS;
 		}
 
