@@ -8,6 +8,7 @@
 #include <string>
 #include <string.h>
 #include <vector>
+#include <sstream>
 #include "../327_proj3_test/includes/StringParserClass.h"
 #include "../327_proj3_test/includes/constants.h"
 
@@ -52,7 +53,33 @@ using namespace KP_StringParserClass;
 		//ERROR_TAGS_NULL if either pStart or pEnd is null
 		//ERROR_DATA_NULL pDataToSearchThru is null
 		int StringParserClass::getDataBetweenTags(char *pDataToSearchThru, vector<string> &myVector) {
+			myVector.clear();
+			if(!pStartTag || !pEndTag)	// confirm order of fail conditions during testing
+				return ERROR_TAGS_NULL;
+			if(!pDataToSearchThru)
+				return ERROR_DATA_NULL;
+			string data = pDataToSearchThru;
 
+			int start = data.find(pStartTag);
+			int end = data.find(pEndTag);
+			data = data.substr(start, end);
+
+			stringstream ss(data);
+			char val;
+			data = ""; // reuse data as single word string
+
+			do {	// will produce lots of empty strings and include the tag word
+				val = ss.get();
+				if(val == ' ' || val == '/' || val == '<' || val == '>') {
+					myVector.push_back(data);
+					data = "";
+				}
+				else
+					data += val;
+			}
+			while(!ss.eof());
+
+			return SUCCESS;
 		}
 
 
