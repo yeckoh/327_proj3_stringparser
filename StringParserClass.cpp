@@ -41,8 +41,16 @@ using namespace KP_StringParserClass;
 			if(!pStart || !pEnd)
 				return ERROR_TAGS_NULL;
 
-			pStartTag = new char(*pStart); // this works on VS_2017
-			pEndTag = new char(*pEnd);
+			int length = sizeof(pStart);
+			pStartTag = new char[length];
+			strcpy(pStartTag, pStart);
+
+			length = sizeof(pEnd);
+			pEndTag = new char[length];
+			strcpy(pEndTag, pEnd);
+
+			//pStartTag = new char(*pStart); // this works on VS_2017
+			//pEndTag = new char(*pEnd);
 			areTagsSet = true;
 			return SUCCESS;
 		}
@@ -60,33 +68,30 @@ using namespace KP_StringParserClass;
 				return ERROR_TAGS_NULL;
 			if(!pDataToSearchThru)
 				return ERROR_DATA_NULL;
+
 			string data = pDataToSearchThru;
 
-			int start = data.find(pStartTag);
+			// take all data and get desired subset
+			int start = data.find(pStartTag) + strlen(pStartTag);
 			int end = data.find(pEndTag);
 			data = data.substr(start, (end-start));
 			stringstream ss(data);
-			char val;
-			data = ""; // reuse data as single word string
 
-			do {	// will produce lots of empty strings and include the tag word
-				val = ss.get();
-				if(val == ' ' || val == '/' || val == '<' || val == '>') {
-				//if(val == ' ') {
-					myVector.push_back(data);
-					data = "";
-				}
-				else
-					data += val;
+			// remove newlines
+			data = "";
+			string line;
+			while(!ss.eof()) {
+				getline(ss, line);
+				data.append(line);
+				data.append(" ");
 			}
-			while(!ss.eof());
 
-			for(int i = 0;i < myVector.size();++i) {
-				if(myVector[i] == ""){
-					myVector[i].erase();
-					--i;
-				}
+			// add tokens to vector
+			stringstream sss(data);
+			while(sss >> line) {
+				myVector.push_back(line);
 			}
+
 			return SUCCESS;
 		}
 
@@ -110,10 +115,16 @@ using namespace KP_StringParserClass;
 				return ERROR_TAGS_NULL;
 			string look_in = pTagToLookFor;
 			int start = look_in.find(pStart);
-			int end = look_in.find(pEnd,start);
+			if(start == string::npos)
+				return FAIL;
+			int end = look_in.find(pEnd, start) + strlen(pEnd);
 			if(end == string::npos)
 				return FAIL;
 			look_in = look_in.substr(start, (end-start));
 			return SUCCESS;
 		}
 
+
+
+
+		// args: "../data/testdata_full.txt" "<to>" "</to>" "../output/outfile.txt"
