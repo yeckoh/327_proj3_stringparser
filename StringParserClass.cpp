@@ -78,17 +78,11 @@ using namespace KP_StringParserClass;
 			stringstream ss(data);
 
 			// remove newlines
-			data = "";
-			string line;
-			while(!ss.eof()) {
-				getline(ss, line);
-				data.append(line);
-				data.append(" ");
-			}
+			// happens in fileIO already, Oof
 
 			// add tokens to vector
-			stringstream sss(data);
-			while(sss >> line) {
+			string line = "";
+			while(ss >> line) {
 				myVector.push_back(line);
 			}
 
@@ -98,8 +92,8 @@ using namespace KP_StringParserClass;
 
 		void StringParserClass::cleanup() {
 			if(areTagsSet){
-				delete pStartTag;
-				delete pEndTag;
+				delete[] pStartTag;
+				delete[] pEndTag;
 			}
 			pStartTag = pEndTag = NULL;
 			areTagsSet = 0;
@@ -111,16 +105,15 @@ using namespace KP_StringParserClass;
 		//FAIL did not find pTagToLookFor and pEnd points to 0
 		//ERROR_TAGS_NULL if either pStart or pEnd is null
 		int StringParserClass::findTag(char *pTagToLookFor, char *&pStart, char *&pEnd) {
-			if(!areTagsSet)
+			if(!pStart || !pEnd)
 				return ERROR_TAGS_NULL;
-			string look_in = pTagToLookFor;
-			int start = look_in.find(pStart);
-			if(start == string::npos)
+
+			string look_in = pStart;
+			unsigned int finder = look_in.find(pTagToLookFor);
+			if(finder == string::npos)
 				return FAIL;
-			int end = look_in.find(pEnd, start) + strlen(pEnd);
-			if(end == string::npos)
-				return FAIL;
-			look_in = look_in.substr(start, (end-start));
+			*pStart = *pStart + finder;
+			pEnd = pStart + strlen(pTagToLookFor);
 			return SUCCESS;
 		}
 
