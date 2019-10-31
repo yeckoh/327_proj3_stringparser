@@ -76,11 +76,10 @@ using namespace KP_StringParserClass;
 					if(!strncmp(i, pEndTag, end_len))
 						end_char = i;
 
-
 				// found both, start copying
 				if(start_char && end_char) {
 					i = start_char;
-					while(i != end_char) {
+					while(i != end_char) { // string add(start, end) breaks the second time around
 						addition += *i;
 						++i;
 					}
@@ -113,12 +112,16 @@ using namespace KP_StringParserClass;
 			if(!pStart || !pEnd)
 				return ERROR_TAGS_NULL;
 
-//			string look_in = pStart;
-//			int finder = look_in.find(pTagToLookFor);
-//			if(finder == string::npos && pEnd == '\0')
-//				return FAIL;
-//			pStart = pStart + finder;
-//			pEnd = pStart + strlen(pTagToLookFor);
-			return SUCCESS;
+			int length = strlen(pTagToLookFor);
+			pEnd = pStart + length;
+
+			while(*pEnd != '\0') {
+				if(!strncmp(pStart, pTagToLookFor, length))
+					return SUCCESS;
+				++pStart;
+				++pEnd;
+			}
+
+			return FAIL;
 		}
 
