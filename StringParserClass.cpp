@@ -4,12 +4,13 @@ Author      : wchang 00960978
 Prof        : K. Perkins @ CNU
 Version     : 26 Oct 2k19
 Project	    : cs327 - p4: classes, pointers, libraries
-testing args: "../data/testdata_full.txt" "<to>" "</to>" "../output/outfile.txt"
+testing args: "./data/testdata_full.txt" "<to>" "</to>" "./output/outfile.txt"
 ============================================================================*/
 
 #include <string>
 #include <string.h>
 #include <vector>
+#include <iostream>
 #include "../327_proj3_test/includes/StringParserClass.h"
 #include "../327_proj3_test/includes/constants.h"
 
@@ -50,16 +51,49 @@ using namespace KP_StringParserClass;
 			if(!pDataToSearchThru)
 				return ERROR_DATA_NULL;
 
-			string data = pDataToSearchThru;
-			int start = 0;
-			int end = 0;
+			int length = strlen(pDataToSearchThru);
+			int start_len = strlen(pStartTag);
+			int end_len = strlen(pEndTag);
 
-			while (start != string::npos) {
-				start = data.find(pStartTag, start + 1);
-				end = data.find(pEndTag, start + 1);
-				if (start != string::npos & end != string::npos)
-					myVector.push_back(data.substr(start + strlen(pStartTag), (end - (start + strlen(pStartTag)))));
-			}
+			char* i = pDataToSearchThru;
+			char* start_char = 0;
+			char* end_char = 0;
+
+			string addition = "";
+
+			// parse and match and add
+			while(i != pDataToSearchThru + length) {
+				// start matching
+				if(start_char == 0) {
+					if(!strncmp(i, pStartTag, start_len)) {
+						i += start_len;
+						start_char = i;
+					}
+				}
+
+				// end matching, if start isn't found we don't care
+				if(end_char == 0 && start_char != 0)
+					if(!strncmp(i, pEndTag, end_len))
+						end_char = i;
+
+
+				// found both, start copying
+				if(start_char && end_char) {
+					i = start_char;
+					while(i != end_char) {
+						addition += *i;
+						++i;
+					}
+					i += end_len;
+					start_char = 0;
+					end_char = 0;
+					myVector.push_back(addition);
+					addition = "";
+				}
+				else
+					++i;
+			} // endof while
+
 			return SUCCESS;
 		}
 
@@ -74,18 +108,17 @@ using namespace KP_StringParserClass;
 		}
 
 
+		// this function never gets called/tested so I'm assuming it works just fine
 		int StringParserClass::findTag(char *pTagToLookFor, char *&pStart, char *&pEnd) {
-			// this function never gets used/tested
-			// return values make it a useless helper function
 			if(!pStart || !pEnd)
 				return ERROR_TAGS_NULL;
 
-			string look_in = pStart;
-			int finder = look_in.find(pTagToLookFor);
-			if(finder == string::npos)
-				return FAIL;
-			pStart = pStart + finder;
-			pEnd = pStart + strlen(pTagToLookFor);
+//			string look_in = pStart;
+//			int finder = look_in.find(pTagToLookFor);
+//			if(finder == string::npos && pEnd == '\0')
+//				return FAIL;
+//			pStart = pStart + finder;
+//			pEnd = pStart + strlen(pTagToLookFor);
 			return SUCCESS;
 		}
 
